@@ -6,6 +6,8 @@
 An otome-style dating sim powered by real CTF security questions.
 Answer questions correctly to raise affection — reach the threshold to unlock confession endings.
 
+<img width="1470" height="830" alt="截圖 2026-03-02 晚上7 22 50" src="https://github.com/user-attachments/assets/ab1d3630-ae09-4914-83c7-1b4c22ec77b0" />
+
 ---
 
 ## Characters
