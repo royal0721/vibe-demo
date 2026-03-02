@@ -1,0 +1,69 @@
+@import "./fonts.css";
+@import "./animations.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base resets ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark;
+  --char-color: #00f5d4;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: #0d0d1a;
+  color: #e2e8f0;
+  font-family: 'Nunito', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0d1a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a4a;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--char-color);
+}
+
+/* ── Selection highlight ── */
+::selection {
+  background: rgba(0, 245, 212, 0.2);
+  color: #fff;
+}
+
+/* ── Focus ring ── */
+:focus-visible {
+  outline: 2px solid var(--char-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Utility: disable text selection on interactive elements ── */
+button, [role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+}

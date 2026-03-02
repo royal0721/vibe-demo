@@ -1,0 +1,246 @@
+# CTF 帥哥攻略遊戲 ♥
+
+> 「CTFをクリアして、心を勝ち取れ」
+> Answer CTF challenges. Win their hearts.
+
+An otome-style dating sim powered by real CTF security questions.
+Answer questions correctly to raise affection — reach the threshold to unlock confession endings.
+
+---
+
+## Characters
+
+| ID | Name | Specialty | Color |
+|----|------|-----------|-------|
+| `zero` | Zero / ゼロ | Binary Exploitation (pwn) | Neon Cyan |
+| `phantom` | Phantom / ファントム | Web Security | Hot Pink |
+| `cipher` | Cipher / サイファー | Cryptography | Purple |
+| `glitch` | Glitch / グリッチ | Reverse Engineering | Amber |
+
+---
+
+## Quick Start
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Set up environment variables
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` — at minimum you need `VITE_GAS_URL` (see [Backend Setup](#backend-setup) below).
+
+```env
+VITE_GAS_URL=https://script.google.com/macros/s/YOUR_ID/exec
+```
+
+The other values have working defaults:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_PASS_THRESHOLD` | `5` | Correct answers needed to pass |
+| `VITE_QUESTION_COUNT` | `10` | Questions per session |
+| `VITE_AFFECTION_PER_CORRECT` | `12` | Affection gained per correct answer |
+| `VITE_AFFECTION_PER_WRONG` | `-5` | Affection lost per wrong answer |
+| `VITE_COMBO_BONUS` | `10` | Bonus for every 3 consecutive correct answers |
+| `VITE_PASS_BONUS` | `20` | Bonus for clearing the stage |
+| `VITE_CONFESSION_THRESHOLD` | `80` | Affection needed to unlock confession ending |
+
+### 3. Run the dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173).
+
+> The game is fully playable without a backend — character select will show an error but all UI, animations, and game flow work normally with demo/empty question sets.
+
+---
+
+## Backend Setup
+
+The backend is a Google Apps Script Web App that reads questions from and writes scores to a Google Sheet.
+
+### Step 1 — Create the Google Sheet
+
+Create a new Google Spreadsheet with **two sheets**:
+
+#### Sheet 1: `題目` (Questions)
+
+複製第一行貼到 A1：
+
+```
+題號	帥哥ID	難度	題目	A	B	C	D	解答	答對台詞	答錯台詞
+```
+
+| 欄 | 說明 | 範例值 |
+|----|------|--------|
+| A 題號 | 唯一數字 ID | `1` |
+| B 帥哥ID | 角色識別碼 | `zero` / `phantom` / `cipher` / `glitch` |
+| C 難度 | 題目難度 | `easy` / `medium` / `hard` |
+| D 題目 | 題目內容 | `What does a buffer overflow exploit?` |
+| E A | 選項 A | `Stack memory` |
+| F B | 選項 B | `Heap allocation` |
+| G C | 選項 C | `Network packets` |
+| H D | 選項 D | `CPU registers` |
+| I 解答 | 正確答案 | `A` / `B` / `C` / `D` |
+| J 答對台詞 | 答對時帥哥台詞（留空用預設） | `Acceptable. Your skills impress me.` |
+| K 答錯台詞 | 答錯時帥哥台詞（留空用預設） | `Stack smashed. Try harder.` |
+
+#### 測試資料（40 題，可直接貼入 `題目` 工作表 A1）
+
+> 複製以下所有內容（含標題行），貼到 `題目` 工作表的 **A1** 儲存格即可。欄位以 Tab 分隔，Google Sheets 會自動分欄。
+
+```
+id	character	difficulty	text	A	B	C	D	correct	correctDialogue	wrongDialogue
+1	zero	easy	記憶體溢位攻擊（Buffer Overflow）利用的是哪種漏洞類型？	記憶體邊界檢查缺失	競爭條件	SQL 注入	路徑穿越	A	……正確。你對記憶體的理解出乎我意料地紮實。	錯了。邊界之外的東西，不是你現在能碰的。
+2	zero	easy	x86 架構中，哪個暫存器負責儲存函式返回位址？	EAX	EBP	EIP	ESP	C	哼。連返回位址都知道放哪。或許你還有點料。	ESP 是堆疊指標，EBP 是基底。搞清楚再來挑戰我。
+3	zero	medium	ret2libc 攻擊的核心原理是什麼？	覆寫 GOT 表	跳轉至 libc 函式執行	繞過 ASLR	利用格式化字串	B	正確。不能執行 shellcode？那就借刀殺人。你懂。	不對。ret2libc 的重點是『借用』，而不是直接攻擊。
+4	zero	medium	NX / DEP 保護機制主要防止哪種攻擊手法？	Stack smashing	Heap spraying	在堆疊上執行程式碼	覆寫 GOT	C	……答對了。不可執行標記，是我最基本的防線之一。	NX 讓記憶體頁面無法執行。記住這個。
+5	zero	medium	Use-After-Free 漏洞是指什麼情況？	使用已釋放的記憶體	兩次 malloc 同一塊	空指標解引用	堆疊溢位	A	正確。釋放之後還念念不忘——無論是記憶體還是其他東西，都很危險。	釋放之後就不該再碰了。這個概念你還沒掌握。
+6	zero	hard	透過洩漏 libc 位址來繞過 ASLR，最常用哪種技術？	ROP chain	Heap feng shui	格式化字串洩漏	SROP	C	格式化字串洩漏。用敵人的弱點反制敵人，這才是正解。	ASLR 隨機化位址，但洩漏一個就夠了。再想想。
+7	zero	hard	什麼是 ROP（Return-Oriented Programming，返回導向程式設計）？	遠端操作協定	串連以 ret 結尾的程式碼片段（gadget）	唯讀保護繞過	暫存器溢位原語	B	……你知道 gadget。那表示你真的在思考，而不只是照本宣科。	ROP 的核心是 gadget 串接。沒有自己的 shellcode，借用別人的指令。
+8	zero	easy	二進制加固中，PIE 代表什麼？	Protected Image Execution	Position Independent Executable	Pointer Integer Encoding	Process Isolation Enable	B	位置無關執行檔。正確。基礎概念，但很多人搞錯。	PIE 讓程式每次載入位址都不同。Position Independent Executable。
+9	zero	medium	格式化字串漏洞的根本成因是什麼？	將使用者輸入直接傳入 printf 等函式	緩衝區下溢	空位元組注入	堆積損壞	A	正確。printf("%s", user_input) 和 printf(user_input) 的差距，就是安全與漏洞的差距。	永遠不要把使用者輸入當成格式化字串。這是最基本的法則。
+10	zero	hard	pwn 領域中，one_gadget 指的是什麼？	可直接觸發 shell 的單一 gadget	單位元組溢位	第一個 ROP gadget	一次性堆積塊	A	一個 gadget，直接拿 shell。高效，乾淨。你的思維跟我一樣。	one_gadget 是 libc 中滿足特定條件就能直接 execve("/bin/sh") 的地址。
+11	phantom	easy	XSS 的全名是什麼？就像我在你心裡留下的那道痕跡～	跨站腳本攻擊（Cross-Site Scripting）	跨伺服器會話	跨站序列化	客戶端腳本	A	呼呼～XSS，跨站腳本。你答對了，就像我成功注入你的思緒一樣～	是跨站腳本，不是伺服器。再仔細想想，親愛的～
+12	phantom	easy	哪種 HTTP 方法會將表單資料放在請求主體（body）中送出？	GET	POST	PUT	HEAD	B	POST。資料藏在 body 裡，看不見但存在著——就像我對你的興趣～	GET 會把參數放在 URL 上，Body 傳輸要靠 POST 喔～
+13	phantom	medium	哪種 SQL 注入透過觀察應用程式的布林回應來提取資料？	聯合查詢型（Union-based）	錯誤型（Error-based）	盲注布林型（Blind boolean-based）	時間型（Time-based）	C	布林盲注～透過 true/false 一點一點套出資訊，就像我慢慢了解你一樣～	盲注就是看不到錯誤回應，要靠布林值或時間差來判斷。
+14	phantom	medium	CSRF 攻擊是什麼？	跨站請求偽造（Cross-Site Request Forgery）	客戶端伺服器回應格式	跨源資源抓取	內容安全規則過濾器	A	讓受害者不知不覺替我發出請求——呼呼，這種手法真的很有我的風格～	CSRF 是讓受信任的使用者在不知情的狀況下執行操作。要用 token 防護喔～
+15	phantom	medium	哪個 HTTP 回應標頭能有效防止點擊劫持（Clickjacking）？	X-XSS-Protection	X-Frame-Options	Content-Type	Access-Control-Allow-Origin	B	X-Frame-Options。禁止頁面被嵌入 iframe——就像我不允許任何人利用我一樣～	防點擊劫持要設 X-Frame-Options: DENY 或 SAMEORIGIN 喔，親愛的～
+16	phantom	hard	SSRF 攻擊的目標通常是什麼？	讓伺服器代替攻擊者發出請求（Server-Side Request Forgery）	會話狀態回應失敗	SQL 儲存回應抓取	子資源腳本重定向缺陷	A	SSRF，讓伺服器替我說話、替我行動～用對方的身分做對方不該做的事，這最有趣了～	SSRF 是讓伺服器本身發出請求，常用來存取內網服務喔～
+17	phantom	easy	WAF 的全名是什麼？就是那個試圖阻擋我的傢伙～	網頁應用程式防火牆（Web Application Firewall）	網頁存取過濾器	無線認證框架	廣域前端	A	WAF，我最喜歡繞過的東西了～你認識它，那很好～	WAF，Web Application Firewall，用來過濾惡意 HTTP 請求的防護層喔～
+18	phantom	hard	JavaScript 中的原型污染（Prototype Pollution）是指什麼？	污染全域作用域	修改 Object.prototype	透過 JSON 實現 XSS	注入 node modules	B	呼呼～修改 Object.prototype 來影響所有物件——這種攻擊真的很有我的美學～	原型污染透過修改 __proto__ 或 constructor.prototype 影響所有繼承的物件喔～
+19	phantom	medium	HTTP 302 狀態碼代表什麼？	禁止存取（Forbidden）	暫時重定向（Temporary Redirect）	找不到資源（Not Found）	伺服器錯誤（Server Error）	B	暫時重定向～302 說的是『先去那裡，但我還在』，很有我的感覺～	301 是永久重定向，302 才是暫時的喔～
+20	phantom	hard	路徑穿越攻擊（Path Traversal）的目的是什麼？	存取網站根目錄以外的檔案	URL 路徑注入	暴力破解目錄	MIME 類型混淆	A	../../../../etc/passwd——用 ../ 一路爬出去，讀取不該讀的檔案～這招很骯髒，但很有效～	路徑穿越是透過 ../ 逃脫 web root，存取系統中的任意檔案喔～
+21	cipher	easy	凱撒密碼（Caesar Cipher）將每個字母偏移固定位數，它屬於哪種密碼類型？	替換式密碼（Substitution）	置換式密碼（Transposition）	區塊密碼（Block）	串流密碼（Stream）	A	替換式密碼。每個字母都有其對應的替身，如同每個數字都有其模式。	替換是改變符號本身，置換是改變位置。概念不同，請重新思考。
+22	cipher	easy	AES-256 的金鑰長度是多少位元（bit）？	128 位元	192 位元	256 位元	512 位元	C	256 位元。2 的 256 次方種可能性。暴力破解在宇宙終結前都找不到答案。	AES 有三種金鑰長度：128、192、256 位元。數字在名稱裡。
+23	cipher	medium	RSA 的安全性建立在哪個數學難題之上？	離散對數問題	整數分解問題	橢圓曲線問題	雜湊碰撞問題	B	整數分解。兩個大質數的乘積，用已知演算法幾乎無法逆推。這就是 RSA 的美。	RSA 的安全性來自大數分解的困難度。橢圓曲線是 ECC 的基礎。
+24	cipher	medium	密碼學中的 nonce 是什麼？	秘密金鑰	只使用一次的數值（Number Used Once）	雜湊輸出	填充位元組	B	只使用一次的數值。重複使用 nonce，就像把同一把鑰匙給了兩個人——這是致命的弱點。	Nonce，Number Used Once，一次性數值。重複使用會導致加密強度大幅下降。
+25	cipher	easy	Base64 編碼使用幾個不同的字元來表示二進位資料？	16 個	32 個	64 個	128 個	C	64 個字元。字母大小寫加數字加兩個符號。如我所推算，你答對了。	Base64 使用 A-Z、a-z、0-9 加上 +/ 共 64 個字元。名字裡就有答案。
+26	cipher	hard	相同的 AES CTR 模式 nonce 被重複使用時，哪種攻擊可以恢復金鑰流？	填充 Oracle 攻擊	位元翻轉 / XOR 金鑰流恢復	時序攻擊	中間相遇攻擊	B	兩段密文 XOR，金鑰流消去，明文關係浮現。數學的必然，無可遁形。	CTR 模式下，相同 nonce 代表相同金鑰流。C1 XOR C2 = P1 XOR P2，致命弱點。
+27	cipher	medium	什麼是雜湊碰撞（Hash Collision）？	兩個不同輸入產生相同的雜湊值	相同輸入產生不同雜湊值	雜湊函式的解密	金鑰碰撞	A	兩個不同的訊息，卻有同樣的指紋。這不應該發生，但它發生了。你答對了。	碰撞是雜湊函式的弱點——不同輸入映射到同一輸出，這破壞了完整性保證。
+28	cipher	hard	填充 Oracle 攻擊（Padding Oracle Attack）的對象是什麼？	RSA-OAEP	使用 PKCS#7 的 AES-CBC 模式	SHA-256	DH 金鑰交換	B	AES-CBC 搭配 PKCS#7 填充。利用伺服器對填充錯誤的不同回應，逐位元組破解密文。	填充 Oracle 攻擊利用的是 CBC 模式中填充驗證的回饋。AES-CBC + PKCS#7 是目標。
+29	cipher	easy	一個值與自身進行 XOR 運算，結果是什麼？	原本的值	1	0	0xFF	C	任何值與自身 XOR 都等於零。這是 XOR 的基本性質，也是理解串流密碼的起點。	A XOR A = 0，永遠如此。這個性質是很多密碼分析的基礎。
+30	cipher	hard	RSA 使用小公開指數（e=3）且訊息未填充時，容易受到哪種攻擊？	Håstad 廣播攻擊（Hastad's Broadcast Attack）	時序攻擊	CRT 故障攻擊	Wiener 攻擊	A	Håstad 廣播攻擊。用中國剩餘定理從多個密文中恢復明文。數學之美，也是數學之刃。	e=3 搭配廣播加密（同一明文送多人）時，Håstad 攻擊可透過 CRT 破解。
+31	glitch	easy	反組譯器（Disassembler）是把二進位程式碼轉換成什麼？	原始碼（Source Code）	組合語言指令（Assembly）	位元組碼（Bytecode）	虛擬碼（Pseudocode）	B	組合語言！！反組譯就是把 0 和 1 變回人類看得懂的 mov、push、call！！	反組譯是 binary → assembly，反編譯才是嘗試還原高階語言喔！
+32	glitch	easy	ELF 檔案格式（Executable and Linkable Format）主要用於哪個系統？	Windows 執行檔	Linux 執行檔	macOS 執行檔	Java 位元組碼	B	Linux 的 ELF！！Windows 用 PE，macOS 用 Mach-O，搞清楚平台超重要！！	ELF 是 Linux 的可執行格式！Windows 用 .exe（PE格式），不一樣喔！
+33	glitch	medium	逆向工程中，反除錯（Anti-Debugging）技術的目的是什麼？	偵測或阻止除錯器附加	程式碼混淆	壓縮二進位	移除符號表	A	偵測除錯器然後逃跑或自我銷毀！！把自己的程式保護起來，我也很敬佩這種工程師！！	反除錯是讓程式在被 GDB 等工具偵錯時表現異常或直接結束！
+34	glitch	medium	哪個 x86 指令常被用來透過時序差異偵測除錯器的存在？	INT 3	RDTSC	CPUID	NOP	B	RDTSC！！讀取時鐘計數器，如果時間差太大代表有人在單步執行——超聰明的偵測方法！！	RDTSC 讀取 CPU 計數器，正常執行很快，被除錯就會變慢——透過時差來偵測！
+35	glitch	easy	哪種工具最常用於動態分析（Dynamic Analysis）二進位程式？	IDA Pro	GDB	Ghidra	Binwalk	B	GDB！！動態分析就是讓程式跑起來然後去偷看它在幹嘛，GDB 是我的好夥伴！！	GDB 是動態的（讓程式跑起來除錯），IDA Pro 和 Ghidra 主要是靜態分析喔！
+36	glitch	hard	什麼是 UPX 封裝的二進位檔？	加密的執行檔	壓縮並能自解壓縮的執行檔	已簽署的執行檔	移除符號表的執行檔	B	UPX 把執行檔壓縮打包，執行時自動解壓！！逆向前記得先 upx -d 解包，不然你在分析的是壓縮器不是程式！！	UPX 是常見的執行檔壓縮工具！要先 upx -d 解包才能正常分析喔！
+37	glitch	medium	在終端機輸入 strings 指令，它會從二進位檔中提取什麼？	函式名稱	可列印的連續字元序列	匯入函式表	符號資訊	B	字串序列！！strings 掃出所有印得出來的文字，常常能找到硬編碼的密碼或 flag 提示！！	strings 命令提取二進位中所有可列印字元序列，超常見的第一步分析工具！
+38	glitch	hard	什麼是 VM 混淆（VM-based Obfuscation）？	在虛擬機器上執行程式	在二進位中嵌入自訂位元組碼解譯器	虛擬化漏洞利用	沙箱逃逸	B	把程式邏輯編譯成自訂指令集，然後在二進位裡自己跑——這種保護超難破，我最享受挑戰它了！！	VM 混淆不是把程式放進 VM，而是把程式的邏輯轉成自訂 bytecode，需要你先逆向這個迷你 VM！
+39	glitch	easy	什麼是 stripped 二進位檔？	移除除錯符號的執行檔	壓縮的執行檔	加密的執行檔	混淆的執行檔	A	符號表被移除的執行檔！！函式名稱、變數名稱統統不見，全變成 sub_XXXXXX，逆向時超考驗功力！！	Stripped 是移除了除錯符號（symbol table），讓函式名稱消失，不是壓縮喔！
+40	glitch	hard	什麼是控制流平坦化（Control Flow Flattening）？	移除迴圈	用分派器（dispatcher）將所有基本區塊串在同一層級	內聯所有函式	移除條件跳轉	B	把所有程式碼區塊都送進一個大的 switch-case 分派器！！正常的流程圖變成一堆方塊在同一層，靜態分析直接爆炸！！	控制流平坦化是把原本有層次的 CFG 重構成一個巨大的 dispatcher switch，讓靜態分析超難追蹤！
+```
+
+> 共 40 題：zero 10 題（pwn）、phantom 10 題（web）、cipher 10 題（crypto）、glitch 10 題（rev）
+> 難度分佈：easy 14 / medium 14 / hard 12
+
+---
+
+#### Sheet 2: `回答` (Answers)
+
+複製第一行貼到 A1：
+
+```
+玩家ID	攻略帥哥	闖關次數	總分	最高分	第一次通關分數	花了幾次通關	最終好感度	解鎖告白結局	最近遊玩時間
+```
+
+| 欄 | 說明 |
+|----|------|
+| A 玩家ID | 玩家輸入的名字 |
+| B 攻略帥哥 | 角色 ID |
+| C 闖關次數 | 累計遊玩次數 |
+| D 總分 | 歷次總分累加 |
+| E 最高分 | 單次最高分 |
+| F 第一次通關分數 | 首次通關分數（不覆蓋） |
+| G 花了幾次通關 | 達成首次通關所需次數 |
+| H 最終好感度 | 最後一次結束時的好感度 |
+| I 解鎖告白結局 | `Y` / `N` |
+| J 最近遊玩時間 | 自動填入 Timestamp |
+
+### Step 2 — Deploy the Apps Script
+
+1. Open [script.google.com](https://script.google.com) → **New project**
+2. Replace the default code with the contents of [`gas/Code.gs`](gas/Code.gs)
+3. Set your Spreadsheet ID on line 7:
+   ```js
+   var SPREADSHEET_ID = "your-spreadsheet-id-here";
+   ```
+   (The ID is in the spreadsheet URL: `https://docs.google.com/spreadsheets/d/`**`THIS_PART`**`/edit`)
+4. Click **Deploy → New deployment**
+   - Type: **Web App**
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+5. Click **Deploy** and copy the Web App URL
+
+### Step 3 — Configure `.env`
+
+Paste the URL into your `.env`:
+
+```env
+VITE_GAS_URL=https://script.google.com/macros/s/AKfycb.../exec
+```
+
+### Step 4 — Verify
+
+Open this URL in your browser — it should return JSON:
+
+```
+https://YOUR_GAS_URL?action=getQuestions&character=zero&count=3
+```
+
+---
+
+## Build for Production
+
+```bash
+npm run build
+```
+
+Output is in `dist/`. Deploy to any static host (Netlify, Vercel, GitHub Pages, etc.).
+
+---
+
+## Project Structure
+
+```
+vibe-demo/
+├── .env                  ← Your config (not committed)
+├── .env.example          ← Template
+├── gas/
+│   └── Code.gs           ← Google Apps Script backend
+└── src/
+    ├── constants/
+    │   ├── env.js         ← Typed env var exports
+    │   ├── characters.js  ← Character metadata & DiceBear params
+    │   └── defaults.js    ← Fallback dialogues & constants
+    ├── hooks/
+    │   ├── useGameState.js ← Core game state machine
+    │   ├── useAffection.js ← Affection math
+    │   └── useHistory.js  ← localStorage history
+    ├── services/
+    │   └── gasApi.js      ← GAS API calls
+    ├── screens/           ← HomeScreen, CharacterSelect, Story, Quiz, Results
+    ├── components/        ← All UI components
+    └── styles/            ← Tailwind + custom animations
+```
+
+---
+
+## Tech Stack
+
+- **React 19** + **Vite 7**
+- **Tailwind CSS v3** — custom hacker-kawaii design system
+- **Framer Motion** — page transitions, timer bar, confession animations
+- **DiceBear API** (`adventurer` style) — character avatars via URL
+- **Google Apps Script** — serverless backend
+- **Google Sheets** — database

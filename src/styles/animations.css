@@ -1,0 +1,188 @@
+/* ====================================================
+   CTF 帥哥攻略 — Custom Animations & Effects
+   ==================================================== */
+
+/* ── CRT Scanline overlay ── */
+.scanline-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+}
+
+.scanline-overlay::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 245, 212, 0.012) 50%,
+    transparent
+  );
+  animation: scanlineMove 6s linear infinite;
+}
+
+@keyframes scanlineMove {
+  0%   { top: -40%; }
+  100% { top: 110%; }
+}
+
+/* ── Glitch title effect ── */
+.glitch-text {
+  position: relative;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.glitch-text:hover::before {
+  opacity: 0.8;
+  color: #ff2d78;
+  animation: glitchA 0.3s steps(2) 3;
+}
+
+.glitch-text:hover::after {
+  opacity: 0.8;
+  color: #00f5d4;
+  animation: glitchB 0.3s steps(2) 3;
+  animation-delay: 0.05s;
+}
+
+@keyframes glitchA {
+  0%   { clip-path: inset(40% 0 61% 0); transform: translate(-3px, 0); }
+  20%  { clip-path: inset(92% 0 1% 0);  transform: translate(3px, 0); }
+  40%  { clip-path: inset(43% 0 1% 0);  transform: translate(-2px, 0); }
+  60%  { clip-path: inset(25% 0 58% 0); transform: translate(2px, 0); }
+  80%  { clip-path: inset(54% 0 7% 0);  transform: translate(-3px, 0); }
+  100% { clip-path: inset(58% 0 43% 0); transform: translate(0, 0); }
+}
+
+@keyframes glitchB {
+  0%   { clip-path: inset(10% 0 85% 0); transform: translate(3px, 0); }
+  20%  { clip-path: inset(62% 0 33% 0); transform: translate(-3px, 0); }
+  40%  { clip-path: inset(78% 0 8% 0);  transform: translate(2px, 0); }
+  60%  { clip-path: inset(4% 0 72% 0);  transform: translate(-2px, 0); }
+  80%  { clip-path: inset(45% 0 48% 0); transform: translate(3px, 0); }
+  100% { clip-path: inset(20% 0 68% 0); transform: translate(0, 0); }
+}
+
+/* ── Neon border pulse ── */
+.neon-border-pulse {
+  animation: neonBorderPulse 2s ease-in-out infinite;
+}
+
+@keyframes neonBorderPulse {
+  0%, 100% { box-shadow: 0 0 6px var(--char-color, #00f5d4), 0 0 12px var(--char-color, #00f5d4)30; }
+  50%       { box-shadow: 0 0 16px var(--char-color, #00f5d4), 0 0 32px var(--char-color, #00f5d4)60, 0 0 48px var(--char-color, #00f5d4)20; }
+}
+
+/* ── Heart particle ── */
+@keyframes heartFloat {
+  0%   { opacity: 1; transform: translateY(0) scale(0.5) rotate(var(--rot)); }
+  60%  { opacity: 1; transform: translateY(-120px) scale(1.2) rotate(var(--rot)); }
+  100% { opacity: 0; transform: translateY(-180px) scale(0.8) rotate(var(--rot)); }
+}
+
+.heart-particle {
+  position: absolute;
+  pointer-events: none;
+  animation: heartFloat var(--duration, 1.5s) ease-out forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+/* ── Typewriter cursor ── */
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background: currentColor;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: cursorBlink 1s step-end infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Card hover shimmer ── */
+.card-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shimmer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.04),
+    transparent
+  );
+  transition: none;
+  pointer-events: none;
+}
+
+.card-shimmer:hover::before {
+  animation: shimmerSlide 0.6s ease-out forwards;
+}
+
+@keyframes shimmerSlide {
+  0%   { left: -100%; }
+  100% { left: 150%; }
+}
+
+/* ── Answer option states ── */
+.answer-correct {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border-color: #22c55e !important;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4) !important;
+}
+
+.answer-wrong {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* ── Confession scene ── */
+@keyframes confessionReveal {
+  0%   { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0);      filter: blur(0); }
+}
+
+.confession-reveal {
+  animation: confessionReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ── Loading dots ── */
+@keyframes loadDot {
+  0%, 80%, 100% { transform: scale(0); opacity: 0; }
+  40%            { transform: scale(1); opacity: 1; }
+}
+
+.load-dot:nth-child(1) { animation: loadDot 1.4s ease-in-out infinite 0s; }
+.load-dot:nth-child(2) { animation: loadDot 1.4s ease-in-out infinite 0.2s; }
+.load-dot:nth-child(3) { animation: loadDot 1.4s ease-in-out infinite 0.4s; }
