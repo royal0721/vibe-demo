@@ -1,11 +1,8 @@
 import { motion } from "framer-motion";
 import { CharacterAvatar } from "../character/CharacterAvatar.jsx";
 import { TypewriterText }  from "../ui/TypewriterText.jsx";
-import { getAffectionTier } from "../../hooks/useAffection.js";
-
-export function CommentBubble({ character, affection }) {
-  const tier    = getAffectionTier(affection);
-  const comment = character.finalComment[tier];
+export function CommentBubble({ character, grade }) {
+  const comment = character.finalComment[grade] ?? character.finalComment.d;
 
   return (
     <motion.div
@@ -19,7 +16,7 @@ export function CommentBubble({ character, affection }) {
       </div>
 
       <div
-        className="relative px-4 py-3 rounded-xl rounded-bl-none text-sm font-body text-gray-100 leading-relaxed flex-1"
+        className="relative px-4 py-3 rounded-xl rounded-bl-none text-base font-body text-gray-100 leading-relaxed flex-1"
         style={{
           backgroundColor: character.color.primary + "15",
           border:          `1px solid ${character.color.primary}40`,
@@ -30,7 +27,7 @@ export function CommentBubble({ character, affection }) {
           className="absolute top-0 left-0 w-1 h-full rounded-l-xl"
           style={{ backgroundColor: character.color.primary }}
         />
-        <div className="pl-2">
+        <div className="pl-2 min-h-[5rem]">
           <TypewriterText text={comment} speed={25} />
         </div>
       </div>

@@ -36,3 +36,16 @@ export function getAffectionTier(affection) {
   if (affection >= 50) return "mid";
   return "low";
 }
+
+export function getConfessionTier(affection) {
+  return affection >= 90 ? "s" : "a";
+}
+
+export function getScoreGrade(score, total) {
+  const pct = total > 0 ? (score / total) * 100 : 0;
+  if (pct >= 90) return "s";
+  if (pct >= 70) return "a";
+  if (pct >= 50) return "b";
+  if (pct >= 30) return "c";
+  return "d";
+}

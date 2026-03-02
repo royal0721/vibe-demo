@@ -2,8 +2,28 @@ import { motion } from "framer-motion";
 import { CharacterAvatar } from "../character/CharacterAvatar.jsx";
 import { HeartParticles }  from "../ui/HeartParticles.jsx";
 import { TypewriterText }  from "../ui/TypewriterText.jsx";
+import { getConfessionTier } from "../../hooks/useAffection.js";
 
-export function ConfessionScene({ character, onClose }) {
+const TIER_CONFIG = {
+  s: {
+    badge:      "💕 完美告白 · S 級結局 💕",
+    heartCount: 30,
+    glowOpacity: "45",
+    particleSize: "large",
+  },
+  a: {
+    badge:      "★ 告白結局 解鎖 ★",
+    heartCount: 20,
+    glowOpacity: "30",
+    particleSize: "normal",
+  },
+};
+
+export function ConfessionScene({ character, affection, onClose }) {
+  const tier   = getConfessionTier(affection ?? 80);
+  const line   = character.confessionTiers?.[tier] ?? character.confessionLine;
+  const config = TIER_CONFIG[tier];
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6"
@@ -13,7 +33,7 @@ export function ConfessionScene({ character, onClose }) {
       transition={{ duration: 0.6 }}
     >
       {/* Heart particles */}
-      <HeartParticles color={character.color.primary} count={20} />
+      <HeartParticles color={character.color.primary} count={config.heartCount} />
 
       {/* Radial glow behind avatar */}
       <div
@@ -38,14 +58,14 @@ export function ConfessionScene({ character, onClose }) {
           style={{
             width:      "280px",
             height:     "160px",
-            background: `radial-gradient(ellipse at bottom, ${character.color.primary}45 0%, transparent 70%)`,
+            background: `radial-gradient(ellipse at bottom, ${character.color.primary}${config.glowOpacity} 0%, transparent 70%)`,
             filter:     "blur(20px)",
           }}
         />
         <CharacterAvatar character={character} size={300} variant="sprite" className="relative" />
       </motion.div>
 
-      {/* Unlock badge */}
+      {/* Tier badge */}
       <motion.div
         className="relative z-10 mb-3 font-display text-sm text-center tracking-widest"
         style={{ color: character.color.primary, textShadow: `0 0 20px ${character.color.primary}` }}
@@ -53,7 +73,7 @@ export function ConfessionScene({ character, onClose }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
       >
-        ★ 告白結局 解鎖 ★
+        {config.badge}
       </motion.div>
 
       {/* Character name */}
@@ -82,7 +102,7 @@ export function ConfessionScene({ character, onClose }) {
         transition={{ delay: 1.3 }}
       >
         <p className="font-body text-gray-100 text-base leading-relaxed italic">
-          <TypewriterText text={`"${character.confessionLine}"`} speed={28} />
+          <TypewriterText text={`"${line}"`} speed={28} />
         </p>
       </motion.div>
 

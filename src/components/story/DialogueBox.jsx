@@ -15,11 +15,11 @@ export function DialogueBox({ character, text, onTextComplete }) {
         className="inline-flex items-center gap-2 px-3 py-1 rounded-t-lg mb-0"
         style={{ backgroundColor: character.color.primary + "30", borderTop: `2px solid ${character.color.primary}` }}
       >
-        <CharacterAvatar character={character} size={28} className="rounded-full" />
-        <span className="font-mono text-base font-bold" style={{ color: character.color.primary }}>
+        <CharacterAvatar character={character} size={32} className="rounded-full" />
+        <span className="font-mono text-lg font-bold" style={{ color: character.color.primary }}>
           {character.name}
         </span>
-        <span className="font-mono text-sm text-gray-500">{character.nameJp}</span>
+        <span className="font-mono text-base text-gray-500">{character.nameJp}</span>
       </div>
 
       {/* Dialogue box */}
@@ -32,7 +32,7 @@ export function DialogueBox({ character, text, onTextComplete }) {
           boxShadow:         `0 4px 24px rgba(0,0,0,0.6), inset 0 1px 0 ${character.color.primary}15`,
         }}
       >
-        <p className="font-body text-xl text-gray-100 leading-relaxed min-h-[3em]">
+        <p className="font-body text-2xl text-gray-100 leading-relaxed min-h-[5rem]">
           <TypewriterText
             text={text}
             speed={22}
@@ -42,7 +42,7 @@ export function DialogueBox({ character, text, onTextComplete }) {
 
         {/* Tap hint arrow */}
         <div className="flex justify-end mt-3">
-          <span className="font-mono text-sm text-gray-500 animate-blink">▼ 點擊繼續</span>
+          <span className="font-mono text-base text-gray-500 animate-blink">▼ 點擊繼續</span>
         </div>
       </div>
     </motion.div>

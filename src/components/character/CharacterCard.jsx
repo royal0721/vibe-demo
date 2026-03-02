@@ -12,7 +12,7 @@ export function CharacterCard({ character, onSelect, historyEntry, isSelected = 
 
   return (
     <motion.div
-      className="card-shimmer relative rounded-2xl border cursor-pointer overflow-hidden select-none"
+      className="card-shimmer relative rounded-2xl border cursor-pointer overflow-hidden select-none h-full"
       style={{
         borderColor:     isSelected ? color.primary : color.border,
         backgroundColor: color.secondary,
@@ -37,7 +37,7 @@ export function CharacterCard({ character, onSelect, historyEntry, isSelected = 
       {/* Background gradient */}
       <div className={`absolute inset-0 bg-gradient-to-b ${character.gradient} pointer-events-none`} />
 
-      <div className="relative p-5 flex flex-col items-center gap-3">
+      <div className="relative p-5 flex flex-col items-center gap-3 h-full justify-between">
         {/* Avatar */}
         <div
           className={`rounded-full p-1 ${isSelected ? "neon-border-pulse" : ""}`}
@@ -48,26 +48,26 @@ export function CharacterCard({ character, onSelect, historyEntry, isSelected = 
 
         {/* Name & specialty */}
         <div className="text-center">
-          <div className="font-body font-extrabold text-2xl text-white leading-tight">
+          <div className="font-body font-extrabold text-3xl text-white leading-tight">
             {character.name}
           </div>
-          <div className="font-mono text-base mt-0.5" style={{ color: color.primary }}>
+          <div className="font-mono text-lg mt-0.5" style={{ color: color.primary }}>
             {character.specialtyLabel}
           </div>
         </div>
 
         {/* Tagline */}
-        <p className="font-body text-gray-400 text-base text-center leading-snug px-1 line-clamp-2">
+        <p className="font-body text-gray-400 text-lg text-center leading-snug px-1">
           {character.tagline}
         </p>
 
         {/* Affection history */}
         <div className="w-full mt-1">
           <div className="flex items-center justify-between mb-1">
-            <span className="font-mono text-xs text-gray-500">
-              {hasPlayed ? "好感度" : "???"}
+            <span className="font-mono text-sm text-gray-500">
+              好感度
             </span>
-            <span className="font-mono text-xs" style={{ color: color.primary }}>
+            <span className="font-mono text-sm" style={{ color: color.primary }}>
               {hasPlayed ? `${affectionPct}%` : "—"}
             </span>
           </div>

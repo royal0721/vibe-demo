@@ -4,11 +4,12 @@ import { ScreenWrapper }     from "../components/layout/ScreenWrapper.jsx";
 import { ScoreSummary }      from "../components/results/ScoreSummary.jsx";
 import { CommentBubble }     from "../components/results/CommentBubble.jsx";
 import { ConfessionScene }   from "../components/results/ConfessionScene.jsx";
-import { CharacterAvatar }   from "../components/character/CharacterAvatar.jsx";
 import { Button }            from "../components/ui/Button.jsx";
 import { getCharacterById }  from "../constants/characters.js";
 import { useHistory }        from "../hooks/useHistory.js";
 import { submitResult }      from "../services/gasApi.js";
+import { getScoreGrade }     from "../hooks/useAffection.js";
+import { QUESTION_COUNT }    from "../constants/env.js";
 
 export function ResultsScreen({ state, dispatch }) {
   const {
@@ -22,10 +23,10 @@ export function ResultsScreen({ state, dispatch }) {
   } = state;
 
   const character = getCharacterById(selectedCharacterId);
+  const grade     = getScoreGrade(score, QUESTION_COUNT);
   const { saveResult } = useHistory(playerName);
 
-  const [showConfession,     setShowConfession]    = useState(false);
-  const [submissionDone,     setSubmissionDone]    = useState(false);
+  const [showConfession,      setShowConfession]     = useState(false);
   const [submissionAttempted, setSubmissionAttempted] = useState(false);
 
   // Save to localStorage and submit to GAS on mount
@@ -41,11 +42,9 @@ export function ResultsScreen({ state, dispatch }) {
     submitResult({ playerName, characterId: selectedCharacterId, score, affection, confessionUnlocked })
       .then(() => {
         dispatch({ type: "SUBMISSION_SUCCESS" });
-        setSubmissionDone(true);
       })
       .catch((err) => {
         dispatch({ type: "SUBMISSION_ERROR", payload: err.message });
-        setSubmissionDone(true);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -74,31 +73,33 @@ export function ResultsScreen({ state, dispatch }) {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="font-mono text-sm text-gray-500 tracking-widest mb-1">結果</div>
-          <h1 className="font-body font-extrabold text-3xl text-white">
+          <div className="font-mono text-base text-gray-500 tracking-widest mb-1">結果</div>
+          <h1 className="font-body font-extrabold text-4xl text-white">
             {confessionUnlocked ? "💕 告白成功 💕" : "闖關結果"}
           </h1>
         </motion.div>
 
-        {/* Submission status */}
-        {submissionError && (
-          <motion.div
-            className="mb-4 p-3 rounded-lg border border-amber-700/50 bg-amber-900/20 font-mono text-sm text-amber-400 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            ⚠ 成績上傳失敗（已儲存於本機）。{submissionError}
-          </motion.div>
-        )}
-        {isSubmitting && (
-          <motion.div
-            className="mb-4 font-mono text-sm text-gray-600 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            儲存結果中...
-          </motion.div>
-        )}
+        {/* Submission status — always reserves space to prevent layout shift */}
+        <div className="mb-4 min-h-[2.5rem] flex items-center justify-center">
+          {submissionError && (
+            <motion.div
+              className="w-full p-3 rounded-lg border border-amber-700/50 bg-amber-900/20 font-mono text-base text-amber-400 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              ⚠ 成績上傳失敗（已儲存於本機）。{submissionError}
+            </motion.div>
+          )}
+          {isSubmitting && !submissionError && (
+            <motion.div
+              className="font-mono text-sm text-gray-600 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              儲存結果中...
+            </motion.div>
+          )}
+        </div>
 
         {/* Score summary */}
         <div className="mb-4">
@@ -111,7 +112,7 @@ export function ResultsScreen({ state, dispatch }) {
 
         {/* Character comment */}
         <div className="mb-6">
-          <CommentBubble character={character} affection={affection} />
+          <CommentBubble character={character} grade={grade} />
         </div>
 
         {/* Actions */}
@@ -142,6 +143,7 @@ export function ResultsScreen({ state, dispatch }) {
       {showConfession && (
         <ConfessionScene
           character={character}
+          affection={affection}
           onClose={() => setShowConfession(false)}
         />
       )}

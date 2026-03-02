@@ -41,7 +41,7 @@ export function CharacterSelectScreen({ state, dispatch }) {
 
   return (
     <ScreenWrapper screenKey="character-select">
-      <div className="min-h-screen px-4 py-10 max-w-2xl mx-auto">
+      <div className="min-h-screen px-4 py-10 max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
           className="text-center mb-8"
@@ -49,13 +49,13 @@ export function CharacterSelectScreen({ state, dispatch }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="font-mono text-sm text-gray-500 tracking-widest mb-1">
-            歡迎，<span className="text-neon-cyan">{playerName}</span>
+          <div className="font-mono text-base text-gray-500 tracking-widest mb-1">
+            歡迎，<span className="text-neon-cyan mx-1">{playerName}</span>
           </div>
-          <h1 className="font-body font-extrabold text-3xl text-white">
+          <h1 className="font-body font-extrabold text-4xl text-white">
             選擇你的攻略對象
           </h1>
-          <p className="font-body text-base text-gray-500 mt-1">
+          <p className="font-body text-lg text-gray-500 mt-1">
             每位帥哥都有不同的 CTF 問題類型
           </p>
         </motion.div>
@@ -76,10 +76,11 @@ export function CharacterSelectScreen({ state, dispatch }) {
         )}
 
         {/* Character grid */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-4 gap-4 mb-8 items-stretch">
           {CHARACTERS.map((char, i) => (
             <motion.div
               key={char.id}
+              className="h-full"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.4 }}

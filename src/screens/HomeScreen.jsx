@@ -29,7 +29,7 @@ export function HomeScreen({ dispatch }) {
           transition={{ duration: 0.6 }}
         >
           {/* CTF label */}
-          <div className="font-mono text-sm text-neon-cyan tracking-[0.3em] mb-4 opacity-70">
+          <div className="font-mono text-base text-neon-cyan tracking-[0.3em] mb-4 opacity-70">
             奪 旗 作 戰
           </div>
 
@@ -42,7 +42,7 @@ export function HomeScreen({ dispatch }) {
           </div>
 
           <motion.div
-            className="font-mono text-sm text-gray-500 tracking-widest mt-3"
+            className="font-mono text-base text-gray-500 tracking-widest mt-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
@@ -79,7 +79,7 @@ export function HomeScreen({ dispatch }) {
               boxShadow:       "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,245,212,0.08)",
             }}
           >
-            <label className="block font-mono text-sm text-gray-500 mb-2 tracking-widest">
+            <label className="block font-mono text-base text-gray-500 mb-2 tracking-widest">
               玩家名稱
             </label>
 
@@ -113,14 +113,14 @@ export function HomeScreen({ dispatch }) {
               開始遊戲 ▶
             </Button>
 
-            <p className="font-mono text-sm text-gray-600 text-center mt-4">
+            <p className="font-mono text-base text-gray-600 text-center mt-4">
               按 Enter 開始
             </p>
           </div>
 
           {/* Version/hint */}
           <motion.p
-            className="text-center font-mono text-sm text-gray-700 mt-6"
+            className="text-center font-mono text-base text-gray-700 mt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}

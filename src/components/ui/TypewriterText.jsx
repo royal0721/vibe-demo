@@ -7,10 +7,10 @@ export function TypewriterText({ text, speed = 20, onComplete, className = "" })
 
   useEffect(() => {
     idxRef.current = 0;
-    setDisplayed("");
     setDone(false);
 
     if (!text) {
+      setDisplayed("");
       setDone(true);
       onComplete?.();
       return;

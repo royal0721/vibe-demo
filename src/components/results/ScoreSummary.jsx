@@ -19,7 +19,7 @@ export function ScoreSummary({ score, affection, color }) {
     >
       {/* Pass/fail banner */}
       <div
-        className="px-4 py-2 text-center font-mono text-sm font-bold"
+        className="px-4 py-2 text-center font-mono text-base font-bold"
         style={{
           backgroundColor: passed ? "#22c55e20" : "#ef444420",
           color:           passed ? "#22c55e"   : "#ef4444",
@@ -41,7 +41,7 @@ export function ScoreSummary({ score, affection, color }) {
           >
             {grade}
           </motion.div>
-          <div className="font-mono text-sm text-gray-500">評級</div>
+          <div className="font-mono text-base text-gray-500">評級</div>
         </div>
 
         {/* Stats grid */}
@@ -65,9 +65,9 @@ function StatBlock({ label, value, color, delay, suffix }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.35 }}
     >
-      <div className="font-mono text-sm text-gray-500 mb-1">{label}</div>
-      <div className="font-mono font-bold text-xl" style={{ color }}>
-        {value}{suffix && <span className="ml-1 text-sm">{suffix}</span>}
+      <div className="font-mono text-base text-gray-500 mb-1">{label}</div>
+      <div className="font-mono font-bold text-2xl" style={{ color }}>
+        {value}{suffix && <span className="ml-1 text-base">{suffix}</span>}
       </div>
     </motion.div>
   );

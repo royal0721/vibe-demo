@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ScreenWrapper }   from "../components/layout/ScreenWrapper.jsx";
 import { CharacterAvatar } from "../components/character/CharacterAvatar.jsx";
 import { AffectionMeter }  from "../components/character/AffectionMeter.jsx";
@@ -113,16 +113,16 @@ export function QuizScreen({ state, dispatch }) {
         style={{ "--char-color": character.color.primary }}
       >
         {/* Top bar */}
-        <div className="px-4 pt-4 pb-2">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="px-5 pt-5 pb-3">
+          <div className="flex items-center gap-3 mb-3">
             {/* Character info */}
             <CharacterAvatar character={character} size={40} className="flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <span className="font-mono text-sm font-bold" style={{ color: character.color.primary }}>
+                <span className="font-mono text-base font-bold" style={{ color: character.color.primary }}>
                   {character.name}
                 </span>
-                <span className="font-mono text-sm text-gray-500">
+                <span className="font-mono text-base text-gray-500">
                   {currentQuestionIndex + 1}/{questions.length}
                 </span>
               </div>
@@ -148,7 +148,7 @@ export function QuizScreen({ state, dispatch }) {
         </div>
 
         {/* Timer */}
-        <div className="px-4 py-2">
+        <div className="px-5 py-3">
           <TimerBar
             isActive={timerActive && !answered}
             onExpire={handleTimerExpire}
@@ -157,7 +157,7 @@ export function QuizScreen({ state, dispatch }) {
         </div>
 
         {/* Main quiz area */}
-        <div className="flex-1 px-4 pb-4 flex flex-col gap-4 overflow-y-auto">
+        <div className="flex-1 px-5 pb-6 flex flex-col gap-5 overflow-y-auto">
           {/* Question */}
           <QuestionBox
             question={question}

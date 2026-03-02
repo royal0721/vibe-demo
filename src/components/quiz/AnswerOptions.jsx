@@ -11,7 +11,7 @@ export function AnswerOptions({ question, selected, onSelect, disabled, color })
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {options.map((text, i) => {
         const label     = LABELS[i];
         const isSelected = selected === label;
@@ -27,8 +27,8 @@ export function AnswerOptions({ question, selected, onSelect, disabled, color })
             key={label}
             className={`
               ${btnClass}
-              relative flex items-start gap-3 p-4 rounded-xl border text-left w-full
-              font-body text-sm text-gray-200 leading-snug
+              relative flex items-start gap-4 p-5 rounded-xl border text-left w-full
+              font-body text-lg text-gray-200 leading-snug
               transition-colors duration-200
               disabled:cursor-default
               ${!disabled && !isSelected ? "hover:border-opacity-80 hover:text-white" : ""}
@@ -49,7 +49,7 @@ export function AnswerOptions({ question, selected, onSelect, disabled, color })
             transition={{ delay: i * 0.06, duration: 0.25 }}
           >
             <span
-              className="font-mono text-xs font-bold flex-shrink-0 w-5 h-5 rounded flex items-center justify-center mt-0.5"
+              className="font-mono text-base font-bold flex-shrink-0 w-7 h-7 rounded flex items-center justify-center mt-0.5"
               style={{
                 backgroundColor: isSelected && !disabled ? color : "rgba(42,42,74,0.8)",
                 color:           isSelected && !disabled ? "#000" : color,

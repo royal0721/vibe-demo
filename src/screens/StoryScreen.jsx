@@ -51,7 +51,7 @@ export function StoryScreen({ state, dispatch }) {
         </div>
 
         {/* Character sprite area — VN portrait style */}
-        <div className="flex-1 flex items-end justify-center px-8 pb-2 overflow-hidden">
+        <div className="flex-1 flex items-center justify-center px-8 overflow-hidden">
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 40 }}
             animate={{ opacity: 1, scale: 1,   y: 0 }}
@@ -77,9 +77,9 @@ export function StoryScreen({ state, dispatch }) {
               className="relative drop-shadow-2xl"
             />
 
-            {/* Character name tag — overlaid on bottom of portrait */}
+            {/* Character name tag — below portrait */}
             <motion.div
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center pointer-events-none"
+              className="mt-3 text-center pointer-events-none"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -92,10 +92,10 @@ export function StoryScreen({ state, dispatch }) {
                   border:          `1px solid ${character.color.primary}40`,
                 }}
               >
-                <span className="font-body font-extrabold text-2xl text-white mr-2">
+                <span className="font-body font-extrabold text-3xl text-white mr-2">
                   {character.name}
                 </span>
-                <span className="font-mono text-sm" style={{ color: character.color.primary }}>
+                <span className="font-mono text-base" style={{ color: character.color.primary }}>
                   {character.specialtyLabel}
                 </span>
               </div>
@@ -105,7 +105,7 @@ export function StoryScreen({ state, dispatch }) {
 
         {/* Dialogue area */}
         <motion.div
-          className="px-4 pb-6 max-w-lg mx-auto w-full"
+          className="px-4 pb-6 mb-12 max-w-lg mx-auto w-full"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}

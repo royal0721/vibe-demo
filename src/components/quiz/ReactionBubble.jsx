@@ -12,10 +12,10 @@ export function ReactionBubble({ character, text, isCorrect, visible }) {
           exit={{ opacity: 0, y: 8, scale: 0.95 }}
           transition={{ duration: 0.3 }}
         >
-          <CharacterAvatar character={character} size={44} className="flex-shrink-0 mb-1" />
+          <CharacterAvatar character={character} size={52} className="flex-shrink-0 mb-1" />
 
           <div
-            className="relative px-4 py-3 rounded-xl rounded-bl-none text-sm font-body text-gray-100 leading-snug max-w-[80%]"
+            className="relative px-5 py-4 rounded-xl rounded-bl-none text-lg font-body text-gray-100 leading-snug max-w-[80%]"
             style={{
               backgroundColor:   character.color.primary + "18",
               border:            `1px solid ${character.color.primary}40`,

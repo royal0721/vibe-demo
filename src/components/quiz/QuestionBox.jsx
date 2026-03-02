@@ -14,7 +14,7 @@ export function QuestionBox({ question, questionNumber, total, color }) {
 
   return (
     <motion.div
-      className="rounded-xl border p-5"
+      className="rounded-xl border p-6"
       style={{
         borderColor:     color + "40",
         backgroundColor: "rgba(13,13,26,0.85)",
@@ -25,16 +25,16 @@ export function QuestionBox({ question, questionNumber, total, color }) {
       key={question.id}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center justify-between mb-3">
-        <span className="font-mono text-sm text-gray-500">
+      <div className="flex items-center justify-between mb-4">
+        <span className="font-mono text-base text-gray-500">
           第 {questionNumber} 題　共 {total} 題
         </span>
-        <span className={`font-mono text-sm px-2 py-0.5 rounded border ${dc.bg} ${dc.text} ${dc.border}`}>
+        <span className={`font-mono text-base px-2 py-0.5 rounded border ${dc.bg} ${dc.text} ${dc.border}`}>
           {DIFFICULTY_LABELS[difficulty] ?? difficulty}
         </span>
       </div>
 
-      <p className="font-body text-lg font-semibold text-gray-100 leading-relaxed">
+      <p className="font-body text-xl font-semibold text-gray-100 leading-relaxed">
         {question.text}
       </p>
     </motion.div>
