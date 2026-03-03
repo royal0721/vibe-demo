@@ -2,8 +2,6 @@ import { motion } from "framer-motion";
 import { CharacterAvatar } from "../character/CharacterAvatar.jsx";
 import { HeartParticles }  from "../ui/HeartParticles.jsx";
 import { TypewriterText }  from "../ui/TypewriterText.jsx";
-import { getConfessionTier } from "../../hooks/useAffection.js";
-
 const TIER_CONFIG = {
   s: {
     badge:      "💕 完美告白 · S 級結局 💕",
@@ -19,10 +17,10 @@ const TIER_CONFIG = {
   },
 };
 
-export function ConfessionScene({ character, affection, onClose }) {
-  const tier   = getConfessionTier(affection ?? 80);
-  const line   = character.confessionTiers?.[tier] ?? character.confessionLine;
-  const config = TIER_CONFIG[tier];
+export function ConfessionScene({ character, tier, onClose }) {
+  const safeTier = (tier === "s" || tier === "a") ? tier : "a";
+  const line     = character.confessionTiers?.[safeTier] ?? character.confessionLine;
+  const config = TIER_CONFIG[safeTier];
 
   return (
     <motion.div

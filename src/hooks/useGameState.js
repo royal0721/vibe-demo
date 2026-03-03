@@ -24,7 +24,7 @@ const initialState = {
 function reducer(state, action) {
   switch (action.type) {
     case "SET_PLAYER_NAME":
-      return { ...state, playerName: action.payload };
+      return { ...state, playerName: String(action.payload ?? "").slice(0, 20) };
 
     case "GO_TO_CHARACTER_SELECT":
       return { ...state, screen: "CHARACTER_SELECT" };

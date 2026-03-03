@@ -24,6 +24,8 @@ export function ResultsScreen({ state, dispatch }) {
 
   const character = getCharacterById(selectedCharacterId);
   const grade     = getScoreGrade(score, QUESTION_COUNT);
+  // Confession only triggers on S or A grade (AND affection threshold met)
+  const confessionEligible = confessionUnlocked && (grade === "s" || grade === "a");
   const { saveResult } = useHistory(playerName);
 
   const [showConfession,      setShowConfession]     = useState(false);
@@ -48,13 +50,13 @@ export function ResultsScreen({ state, dispatch }) {
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Show confession after a short delay if unlocked
+  // Show confession after a short delay if eligible (score A/S + affection threshold)
   useEffect(() => {
-    if (confessionUnlocked) {
+    if (confessionEligible) {
       const t = setTimeout(() => setShowConfession(true), 1200);
       return () => clearTimeout(t);
     }
-  }, [confessionUnlocked]);
+  }, [confessionEligible]);
 
   if (!character) {
     dispatch({ type: "RESET_GAME" });
@@ -75,7 +77,7 @@ export function ResultsScreen({ state, dispatch }) {
         >
           <div className="font-mono text-base text-gray-500 tracking-widest mb-1">結果</div>
           <h1 className="font-body font-extrabold text-4xl text-white">
-            {confessionUnlocked ? "💕 告白成功 💕" : "闖關結果"}
+            {confessionEligible ? "💕 告白成功 💕" : "闖關結果"}
           </h1>
         </motion.div>
 
@@ -87,7 +89,7 @@ export function ResultsScreen({ state, dispatch }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              ⚠ 成績上傳失敗（已儲存於本機）。{submissionError}
+              ⚠ 成績上傳失敗（已儲存於本機）
             </motion.div>
           )}
           {isSubmitting && !submissionError && (
@@ -143,7 +145,7 @@ export function ResultsScreen({ state, dispatch }) {
       {showConfession && (
         <ConfessionScene
           character={character}
-          affection={affection}
+          tier={grade}
           onClose={() => setShowConfession(false)}
         />
       )}

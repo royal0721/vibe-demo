@@ -15,7 +15,7 @@ export default {
       },
       fontFamily: {
         display: ["'Press Start 2P'", "monospace"],
-        body:    ["'Nunito'", "sans-serif"],
+        body:    ["'M PLUS Rounded 1c'", "sans-serif"],
         mono:    ["'JetBrains Mono'", "monospace"],
       },
       keyframes: {

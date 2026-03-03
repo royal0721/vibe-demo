@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ScreenWrapper }   from "../components/layout/ScreenWrapper.jsx";
 import { CharacterAvatar } from "../components/character/CharacterAvatar.jsx";
 import { AffectionMeter }  from "../components/character/AffectionMeter.jsx";
@@ -34,6 +34,7 @@ export function QuizScreen({ state, dispatch }) {
   const [floatDelta,      setFloatDelta]       = useState(0);
   const [showDelta,       setShowDelta]        = useState(false);
   const [timerActive,     setTimerActive]      = useState(true);
+  const [flashCorrect,    setFlashCorrect]     = useState(null); // true | false | null
   const latestAnswerRef   = useRef(null);
   const advanceTimer      = useRef(null);
 
@@ -75,6 +76,8 @@ export function QuizScreen({ state, dispatch }) {
     setTimerActive(false);
     setReactionText(reactionLine);
     setReactionCorrect(isCorrect);
+    setFlashCorrect(isCorrect);
+    setTimeout(() => setFlashCorrect(null), 600);
 
     // Dispatch state update
     dispatch({ type: "ANSWER_QUESTION", payload: { selected: label, isCorrect } });
@@ -122,9 +125,21 @@ export function QuizScreen({ state, dispatch }) {
                 <span className="font-mono text-base font-bold" style={{ color: character.color.primary }}>
                   {character.name}
                 </span>
-                <span className="font-mono text-base text-gray-500">
-                  {currentQuestionIndex + 1}/{questions.length}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="font-mono text-base px-2 py-0.5 rounded"
+                    style={{
+                      backgroundColor: character.color.primary + "18",
+                      color:           character.color.primary,
+                      border:          `1px solid ${character.color.primary}30`,
+                    }}
+                  >
+                    {score} 答對
+                  </span>
+                  <span className="font-mono text-base text-gray-500">
+                    {currentQuestionIndex + 1}/{questions.length}
+                  </span>
+                </div>
               </div>
               {/* Affection meter */}
               <AffectionMeter
@@ -193,17 +208,26 @@ export function QuizScreen({ state, dispatch }) {
           />
         </div>
 
-        {/* Score chip */}
-        <div
-          className="absolute top-4 right-4 font-mono text-sm px-3 py-1 rounded-lg"
-          style={{
-            backgroundColor: character.color.primary + "15",
-            color:           character.color.primary,
-            border:          `1px solid ${character.color.primary}30`,
-          }}
-        >
-          {score} 答對
-        </div>
+        {/* Answer flash overlay */}
+        <AnimatePresence>
+          {flashCorrect !== null && (
+            <motion.div
+              className="pointer-events-none fixed inset-0 z-40"
+              style={{
+                background: flashCorrect
+                  ? "radial-gradient(ellipse at center, rgba(34,197,94,0.18) 0%, transparent 70%)"
+                  : "radial-gradient(ellipse at center, rgba(239,68,68,0.18) 0%, transparent 70%)",
+                boxShadow: flashCorrect
+                  ? "inset 0 0 80px rgba(34,197,94,0.22)"
+                  : "inset 0 0 80px rgba(239,68,68,0.22)",
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </ScreenWrapper>
   );

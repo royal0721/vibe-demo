@@ -11,6 +11,13 @@ var SPREADSHEET_ID  = "YOUR_SPREADSHEET_ID_HERE"; // <-- replace this
 var SHEET_QUESTIONS = "題目";
 var SHEET_ANSWERS   = "回答";
 
+// Server-side constants (not trusted from client)
+var PASS_THRESHOLD       = 5;
+var MAX_SCORE            = 10;
+var CONFESSION_THRESHOLD = 80;
+var MAX_NAME_LENGTH      = 50;
+var VALID_CHARACTERS     = ["zero", "phantom", "cipher", "glitch"];
+
 // ── Router ──────────────────────────────────────────────────
 
 function doGet(e) {
@@ -22,10 +29,11 @@ function doGet(e) {
     } else if (action === "getHistory") {
       result = handleGetHistory(e.parameter);
     } else {
-      result = { error: "Unknown action: " + action };
+      result = { error: "Unknown action" };
     }
   } catch (err) {
-    result = { error: err.message };
+    console.error(err.toString());
+    result = { error: "Internal server error" };
   }
   return ContentService
     .createTextOutput(JSON.stringify(result))
@@ -41,10 +49,11 @@ function doPost(e) {
     if (action === "submitResult") {
       result = handleSubmitResult(data);
     } else {
-      result = { error: "Unknown action: " + action };
+      result = { error: "Unknown action" };
     }
   } catch (err) {
-    result = { error: err.message };
+    console.error(err.toString());
+    result = { error: "Internal server error" };
   }
   return ContentService
     .createTextOutput(JSON.stringify(result))
@@ -54,8 +63,13 @@ function doPost(e) {
 // ── Question Fetching ────────────────────────────────────────
 
 function handleGetQuestions(params) {
-  var characterId = params.character;
-  var count       = parseInt(params.count) || 10;
+  var characterId = String(params.character || "").toLowerCase().trim();
+  var count       = Math.min(Math.max(parseInt(params.count) || 10, 1), 50);
+
+  // Validate characterId against allowlist
+  if (VALID_CHARACTERS.indexOf(characterId) === -1) {
+    return { error: "Invalid character" };
+  }
 
   var ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName(SHEET_QUESTIONS);
@@ -67,7 +81,7 @@ function handleGetQuestions(params) {
     // Skip empty rows
     if (!row[0]) continue;
     // Column B (index 1) is character ID
-    if (String(row[1]).toLowerCase() === String(characterId).toLowerCase()) {
+    if (String(row[1]).toLowerCase() === characterId) {
       questions.push({
         id:              row[0],
         character:       row[1],
@@ -93,7 +107,8 @@ function handleGetQuestions(params) {
 // ── History Fetching ─────────────────────────────────────────
 
 function handleGetHistory(params) {
-  var playerName = params.player;
+  var playerName = sanitizeName(String(params.player || ""));
+  if (!playerName) return { history: {} };
 
   var ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName(SHEET_ANSWERS);
@@ -103,7 +118,7 @@ function handleGetHistory(params) {
   for (var i = 1; i < rows.length; i++) {
     var row = rows[i];
     if (!row[0]) continue;
-    if (String(row[0]) === String(playerName)) {
+    if (String(row[0]) === playerName) {
       var charId = String(row[1]);
       history[charId] = {
         playCount:           row[2] || 0,
@@ -124,13 +139,26 @@ function handleGetHistory(params) {
 // ── Result Submission ─────────────────────────────────────────
 
 function handleSubmitResult(data) {
-  var playerName          = String(data.playerName);
-  var characterId         = String(data.characterId);
-  var score               = Number(data.score) || 0;
-  var affection           = Number(data.affection) || 0;
-  var confessionUnlocked  = data.confessionUnlocked === true;
-  var passThreshold       = Number(data.passThreshold) || 5;
-  var now                 = new Date();
+  // Sanitize and validate all inputs server-side; never trust the client
+  var playerName = sanitizeName(String(data.playerName || ""));
+  if (!playerName) return { error: "Invalid player name" };
+
+  var characterId = String(data.characterId || "").toLowerCase().trim();
+  if (VALID_CHARACTERS.indexOf(characterId) === -1) {
+    return { error: "Invalid character" };
+  }
+
+  // Clamp numeric values to valid ranges
+  var score     = Math.min(Math.max(Math.round(Number(data.score) || 0), 0), MAX_SCORE);
+  var affection = Math.min(Math.max(Math.round(Number(data.affection) || 0), 0), 100);
+
+  // Server computes passed — ignore client-supplied passThreshold
+  var passed = score >= PASS_THRESHOLD;
+
+  // Server validates confession eligibility — client cannot grant itself confession
+  var confessionUnlocked = affection >= CONFESSION_THRESHOLD;
+
+  var now = new Date();
 
   var ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName(SHEET_ANSWERS);
@@ -143,8 +171,6 @@ function handleSubmitResult(data) {
       break;
     }
   }
-
-  var passed = score >= passThreshold;
 
   if (existingRowIndex === -1) {
     // New record
@@ -195,6 +221,15 @@ function handleSubmitResult(data) {
 }
 
 // ── Utilities ────────────────────────────────────────────────
+
+// Sanitize player name: truncate, strip formula-injection chars (= + - @),
+// and strip control characters
+function sanitizeName(name) {
+  var trimmed = String(name).trim().slice(0, MAX_NAME_LENGTH);
+  // Prevent Google Sheets formula injection by stripping leading special chars
+  trimmed = trimmed.replace(/^[=+\-@\t\r]+/, "");
+  return trimmed;
+}
 
 function shuffleArray(array) {
   var arr = array.slice();

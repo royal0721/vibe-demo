@@ -35,13 +35,14 @@ export function CharacterSelectScreen({ state, dispatch }) {
       const questions = await fetchQuestions(characterId, QUESTION_COUNT);
       dispatch({ type: "QUESTIONS_LOADED", payload: questions });
     } catch (err) {
+      console.error("[fetchQuestions]", err);
       dispatch({ type: "QUESTIONS_ERROR", payload: err.message });
     }
   }
 
   return (
     <ScreenWrapper screenKey="character-select">
-      <div className="min-h-screen px-4 py-10 max-w-5xl mx-auto">
+      <div className="min-h-screen flex flex-col justify-center px-4 py-10 max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
           className="text-center mb-8"
@@ -67,7 +68,7 @@ export function CharacterSelectScreen({ state, dispatch }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            ⚠ 題目載入失敗：{questionsError}
+            ⚠ 題目載入失敗，請稍後再試
             <br />
             <span className="text-gray-500">
               請確認 .env 中的 VITE_GAS_URL 設定是否正確
@@ -95,23 +96,23 @@ export function CharacterSelectScreen({ state, dispatch }) {
           ))}
         </div>
 
-        {/* Loading state */}
-        {loadingQuestions && selectedCharacterId && (
-          <motion.div
-            className="text-center py-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <div className="flex items-center justify-center gap-2 font-mono text-sm text-gray-500">
+        {/* Loading state — always reserves space */}
+        <div className="min-h-[3rem] flex items-center justify-center mb-2">
+          {loadingQuestions && selectedCharacterId && (
+            <motion.div
+              className="flex items-center gap-2 font-mono text-sm text-gray-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
               <div className="flex gap-1">
                 <span className="load-dot w-2 h-2 bg-neon-cyan rounded-full" />
                 <span className="load-dot w-2 h-2 bg-neon-cyan rounded-full" />
                 <span className="load-dot w-2 h-2 bg-neon-cyan rounded-full" />
               </div>
               題目載入中...
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </div>
 
         {/* Back button */}
         <div className="text-center">
