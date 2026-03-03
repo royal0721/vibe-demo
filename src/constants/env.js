@@ -6,3 +6,4 @@ export const AFFECTION_PER_WRONG   = Number(import.meta.env.VITE_AFFECTION_PER_W
 export const COMBO_BONUS           = Number(import.meta.env.VITE_COMBO_BONUS     ?? 10);
 export const PASS_BONUS            = Number(import.meta.env.VITE_PASS_BONUS      ?? 20);
 export const CONFESSION_THRESHOLD  = Number(import.meta.env.VITE_CONFESSION_THRESHOLD ?? 80);
+export const GOOGLE_CLIENT_ID      = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";

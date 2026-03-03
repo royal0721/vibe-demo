@@ -126,7 +126,29 @@ export function QuizScreen({ state, dispatch }) {
                   {character.name}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span
+                  <AnimatePresence>
+                    {combo >= 2 && (
+                      <motion.span
+                        key={combo}
+                        initial={{ scale: 1.4, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                        className="font-mono text-sm px-2 py-0.5 rounded"
+                        style={{
+                          backgroundColor: character.color.primary + "25",
+                          color:           character.color.primary,
+                        }}
+                      >
+                        🔥 {combo} 連擊
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                  <motion.span
+                    key={score}
+                    initial={{ scale: 1.5 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 18 }}
                     className="font-mono text-base px-2 py-0.5 rounded"
                     style={{
                       backgroundColor: character.color.primary + "18",
@@ -135,7 +157,7 @@ export function QuizScreen({ state, dispatch }) {
                     }}
                   >
                     {score} 答對
-                  </span>
+                  </motion.span>
                   <span className="font-mono text-base text-gray-500">
                     {currentQuestionIndex + 1}/{questions.length}
                   </span>

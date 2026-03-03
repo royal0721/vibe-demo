@@ -7,6 +7,7 @@ const INITIAL_AFFECTION = 50;
 const initialState = {
   screen:               "HOME",  // HOME | CHARACTER_SELECT | STORY | QUIZ | RESULTS
   playerName:           "",
+  googleUser:           null,    // { name, email, picture }
   selectedCharacterId:  null,
   questions:            [],
   loadingQuestions:     false,
@@ -23,6 +24,9 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
+    case "SET_GOOGLE_USER":
+      return { ...state, googleUser: action.payload };
+
     case "SET_PLAYER_NAME":
       return { ...state, playerName: String(action.payload ?? "").slice(0, 20) };
 

@@ -1,21 +1,19 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { GoogleLogin } from "@react-oauth/google";
 import { ScreenWrapper } from "../components/layout/ScreenWrapper.jsx";
 import { GlitchText }    from "../components/ui/GlitchText.jsx";
-import { Button }        from "../components/ui/Button.jsx";
+import { GOOGLE_CLIENT_ID } from "../constants/env.js";
 
 export function HomeScreen({ dispatch }) {
-  const [name, setName] = useState("");
+  function handleGoogleSuccess(credentialResponse) {
+    // Decode JWT payload (base64url → JSON) without a library
+    const base64 = credentialResponse.credential.split(".")[1];
+    const json   = JSON.parse(atob(base64.replace(/-/g, "+").replace(/_/g, "/")));
+    const { name, email, picture } = json;
 
-  function handleStart() {
-    const trimmed = name.trim();
-    if (!trimmed) return;
-    dispatch({ type: "SET_PLAYER_NAME", payload: trimmed });
+    dispatch({ type: "SET_GOOGLE_USER",  payload: { name, email, picture } });
+    dispatch({ type: "SET_PLAYER_NAME",  payload: name });
     dispatch({ type: "GO_TO_CHARACTER_SELECT" });
-  }
-
-  function handleKey(e) {
-    if (e.key === "Enter") handleStart();
   }
 
   return (
@@ -28,12 +26,10 @@ export function HomeScreen({ dispatch }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          {/* CTF label */}
           <div className="font-mono text-base text-neon-cyan tracking-[0.3em] mb-4 opacity-70">
             奪 旗 作 戰
           </div>
 
-          {/* Main title */}
           <div className="relative mb-2">
             <GlitchText
               text="帥哥攻略"
@@ -50,7 +46,6 @@ export function HomeScreen({ dispatch }) {
             「解開 CTF，攻略他的心」
           </motion.div>
 
-          {/* Decorative line */}
           <motion.div
             className="flex items-center gap-3 mt-6 justify-center"
             initial={{ opacity: 0 }}
@@ -63,7 +58,7 @@ export function HomeScreen({ dispatch }) {
           </motion.div>
         </motion.div>
 
-        {/* Input card */}
+        {/* Login card */}
         <motion.div
           className="w-full max-w-md"
           initial={{ opacity: 0, y: 20 }}
@@ -71,7 +66,7 @@ export function HomeScreen({ dispatch }) {
           transition={{ delay: 0.4, duration: 0.5 }}
         >
           <div
-            className="rounded-2xl border p-10"
+            className="rounded-2xl border p-10 flex flex-col items-center gap-6"
             style={{
               backgroundColor: "rgba(26,26,46,0.85)",
               borderColor:     "rgba(0,245,212,0.25)",
@@ -79,46 +74,32 @@ export function HomeScreen({ dispatch }) {
               boxShadow:       "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,245,212,0.08)",
             }}
           >
-            <label className="block font-mono text-base text-gray-500 mb-2 tracking-widest">
-              玩家名稱
-            </label>
-
-            {/* Terminal prompt input */}
-            <div className="flex items-center gap-2 border-b border-neon-cyan/30 pb-2 mb-6">
-              <span className="font-mono text-neon-cyan text-base select-none">&gt;</span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onKeyDown={handleKey}
-                placeholder="輸入你的名字..."
-                maxLength={20}
-                className="flex-1 bg-transparent font-mono text-base text-white placeholder-gray-600 outline-none caret-neon-cyan"
-                autoFocus
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck="false"
-              />
-              {name && (
-                <span className="font-mono text-sm text-gray-600">{name.length}/20</span>
-              )}
-            </div>
-
-            <Button
-              onClick={handleStart}
-              disabled={!name.trim()}
-              className="w-full justify-center text-center"
-              charColor="#00f5d4"
-            >
-              開始遊戲 ▶
-            </Button>
-
-            <p className="font-mono text-base text-gray-600 text-center mt-4">
-              按 Enter 開始
+            <p className="font-mono text-base text-gray-400 tracking-widest">
+              以 Google 帳號登入開始
             </p>
+
+            {GOOGLE_CLIENT_ID ? (
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => console.error("Google login failed")}
+                theme="filled_black"
+                shape="pill"
+                locale="zh-TW"
+              />
+            ) : (
+              <div
+                className="w-full rounded-xl border p-4 text-center"
+                style={{ borderColor: "rgba(239,68,68,0.4)", backgroundColor: "rgba(239,68,68,0.08)" }}
+              >
+                <p className="font-mono text-sm text-red-400 mb-2">尚未設定 Google Client ID</p>
+                <p className="font-mono text-xs text-gray-500 leading-relaxed">
+                  請在 .env 中設定 VITE_GOOGLE_CLIENT_ID<br />
+                  前往 Google Cloud Console 建立 OAuth 2.0 用戶端 ID
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Version/hint */}
           <motion.p
             className="text-center font-mono text-base text-gray-700 mt-6"
             initial={{ opacity: 0 }}
@@ -129,7 +110,6 @@ export function HomeScreen({ dispatch }) {
           </motion.p>
         </motion.div>
 
-        {/* Decorative corner elements */}
         <div className="absolute top-6 left-6 font-mono text-xs text-gray-800 select-none">
           v1.0.0
         </div>
