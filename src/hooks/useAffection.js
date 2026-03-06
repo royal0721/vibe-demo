@@ -49,3 +49,11 @@ export function getScoreGrade(score, total) {
   if (pct >= 30) return "c";
   return "d";
 }
+
+export function getAffectionGrade(affection) {
+  if (affection >= 90) return "s";
+  if (affection >= 70) return "a";
+  if (affection >= 50) return "b";
+  if (affection >= 30) return "c";
+  return "d";
+}
