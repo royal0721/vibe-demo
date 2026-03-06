@@ -81,17 +81,25 @@ export function CharacterSelectScreen({ state, dispatch }) {
           {CHARACTERS.map((char, i) => (
             <motion.div
               key={char.id}
-              className="h-full"
+              className="flex flex-col gap-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.4 }}
             >
-              <CharacterCard
-                character={char}
-                onSelect={handleSelect}
-                historyEntry={history[char.id]}
-                isSelected={selectedCharacterId === char.id}
-              />
+              <div className="flex-1">
+                <CharacterCard
+                  character={char}
+                  onSelect={handleSelect}
+                  historyEntry={history[char.id]}
+                  isSelected={selectedCharacterId === char.id}
+                />
+              </div>
+              <Button
+                variant="secondary"
+                onClick={() => dispatch({ type: "GO_TO_CHARACTER_QA", payload: char.id })}
+              >
+                查看專區
+              </Button>
             </motion.div>
           ))}
         </div>

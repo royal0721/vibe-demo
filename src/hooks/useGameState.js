@@ -1,6 +1,9 @@
 import { useReducer } from "react";
 import { calculateAffectionDelta, clampAffection, isConfessionUnlocked } from "./useAffection.js";
 import { QUESTION_COUNT } from "../constants/env.js";
+import { CHARACTERS } from "../constants/characters.js";
+
+const VALID_CHARACTER_IDS = new Set(CHARACTERS.map((c) => c.id));
 
 const INITIAL_AFFECTION = 50;
 
@@ -128,6 +131,15 @@ function reducer(state, action) {
         submissionError:      null,
         questionsError:       null,
       };
+
+    case "GO_TO_CHARACTER_QA": {
+      if (!VALID_CHARACTER_IDS.has(action.payload)) return state;
+      return { ...state, screen: "CHARACTER_QA", selectedCharacterId: action.payload };
+    }
+
+    case "BACK_FROM_CHARACTER_QA":
+      if (state.screen !== "CHARACTER_QA") return state;
+      return { ...state, screen: "CHARACTER_SELECT", selectedCharacterId: null };
 
     case "GO_TO_DASHBOARD":
       return { ...state, screen: "DASHBOARD" };
