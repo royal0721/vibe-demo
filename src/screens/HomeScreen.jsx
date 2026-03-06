@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { GoogleLogin } from "@react-oauth/google";
 import { ScreenWrapper } from "../components/layout/ScreenWrapper.jsx";
 import { GlitchText }    from "../components/ui/GlitchText.jsx";
+import { Button }        from "../components/ui/Button.jsx";
 import { GOOGLE_CLIENT_ID } from "../constants/env.js";
 
 export function HomeScreen({ dispatch }) {
@@ -108,6 +109,21 @@ export function HomeScreen({ dispatch }) {
           >
             4 位帥哥 · CTF 問答 · 解鎖告白結局
           </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="w-full mt-2"
+          >
+            <Button
+              variant="ghost"
+              onClick={() => dispatch({ type: "GO_TO_DASHBOARD" })}
+              className="w-full text-center text-gray-600 hover:text-gray-400"
+            >
+              📊 攻略紀錄
+            </Button>
+          </motion.div>
         </motion.div>
 
         <div className="absolute top-6 left-6 font-mono text-xs text-gray-800 select-none">

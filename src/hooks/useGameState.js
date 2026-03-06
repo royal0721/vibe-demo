@@ -5,7 +5,7 @@ import { QUESTION_COUNT } from "../constants/env.js";
 const INITIAL_AFFECTION = 50;
 
 const initialState = {
-  screen:               "HOME",  // HOME | CHARACTER_SELECT | STORY | QUIZ | RESULTS
+  screen:               "HOME",  // HOME | CHARACTER_SELECT | STORY | QUIZ | RESULTS | DASHBOARD
   playerName:           "",
   googleUser:           null,    // { name, email, picture }
   selectedCharacterId:  null,
@@ -128,6 +128,12 @@ function reducer(state, action) {
         submissionError:      null,
         questionsError:       null,
       };
+
+    case "GO_TO_DASHBOARD":
+      return { ...state, screen: "DASHBOARD" };
+
+    case "BACK_TO_HOME_FROM_DASHBOARD":
+      return { ...state, screen: "HOME" };
 
     case "RESET_GAME":
       return initialState;

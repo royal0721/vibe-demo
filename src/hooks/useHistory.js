@@ -23,6 +23,10 @@ function readStorage() {
   }
 }
 
+export function getAllHistory() {
+  return readStorage();
+}
+
 export function useHistory(playerName) {
   const safeName = sanitizeName(playerName ?? "");
 

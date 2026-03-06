@@ -5,12 +5,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev      # start Vite dev server
-npm run build    # production build (vite build only — no TypeScript type-check)
-npm run preview  # preview production build locally
+npm run dev          # start Vite dev server
+npm run build        # production build (vite build only — no TypeScript type-check)
+npm run preview      # preview production build locally
+npm run test         # run tests once (vitest run)
+npm run test:watch   # run tests in watch mode (vitest)
 ```
 
-No lint or test commands are configured. The project is pure JSX — `tsconfig.json` exists only as a Vite artifact and is not used for compilation.
+No lint command is configured. The project is pure JSX — `tsconfig.json` exists only as a Vite artifact and is not used for compilation.
+
+### Testing
+
+Vitest + `@testing-library/react` + jsdom. Setup file: `src/test/setup.js` (imports `@testing-library/jest-dom`).
+
+- Test files go next to the module they test: `src/hooks/useAffection.test.js`, etc.
+- Pure logic functions (affection, history helpers) are the primary test targets.
+- React component tests use `@testing-library/react` — render, query, assert on DOM output.
+- `globals: true` is set in `vite.config.js`, so `describe`/`it`/`expect` are available without imports.
 
 ## Architecture
 
@@ -22,6 +33,7 @@ Single `useReducer` drives the whole app. Screens follow this flow:
 
 ```
 HOME → CHARACTER_SELECT → STORY → QUIZ → RESULTS
+HOME → DASHBOARD → HOME
 ```
 
 All game state (selected character, questions, answers, affection, combo, score) lives in this one reducer. `dispatch` and `state` are passed as props down to each screen.
@@ -35,7 +47,8 @@ All game state (selected character, questions, answers, affection, combo, score)
 Pure calculation functions (no hooks, despite the filename):
 - `calculateAffectionDelta` — correct answers give `+AFFECTION_PER_CORRECT` with a combo bonus every 3rd consecutive correct answer; wrong answers give `AFFECTION_PER_WRONG`. A `PASS_BONUS` is applied on the final question if score ≥ `PASS_THRESHOLD`.
 - `clampAffection` — clamps to [0, 100]
-- `getScoreGrade` — returns `s/a/b/c/d` based on percentage
+- `getScoreGrade` — returns `s/a/b/c/d` based on score percentage
+- `getAffectionGrade` — returns `s/a/b/c/d` based on affection value (used in dashboard)
 - `getAffectionTier` — returns `high/mid/low`
 - Confession triggers only if affection ≥ `CONFESSION_THRESHOLD` **AND** grade is `s` or `a`
 
@@ -67,6 +80,9 @@ Each character object contains: id, name, neon color tokens, DiceBear avatar par
 ### Persistence (`src/hooks/useHistory.js`)
 
 localStorage key `ctf-dating-sim-v1`. Stores per-player, per-character: `affection`, `confessionUnlocked`, `lastPlayed`. Uses `Object.create(null)` throughout to prevent prototype pollution.
+
+- `useHistory(playerName)` — hook exposing `getPlayerHistory()` and `saveResult()`
+- `getAllHistory()` — standalone export that returns the full storage object (all players); used by `DashboardScreen` to aggregate best scores across all player entries
 
 ### Tailwind design tokens (`tailwind.config.js`)
 

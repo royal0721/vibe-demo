@@ -5,6 +5,7 @@ import { CharacterSelectScreen }   from "./screens/CharacterSelectScreen.jsx";
 import { StoryScreen }             from "./screens/StoryScreen.jsx";
 import { QuizScreen }              from "./screens/QuizScreen.jsx";
 import { ResultsScreen }           from "./screens/ResultsScreen.jsx";
+import { DashboardScreen }         from "./screens/DashboardScreen.jsx";
 import { useGameState }            from "./hooks/useGameState.js";
 import { CHARACTERS, buildDiceBearUrl } from "./constants/characters.js";
 
@@ -17,6 +18,7 @@ export default function App() {
     STORY:            <StoryScreen state={state} dispatch={dispatch} />,
     QUIZ:             <QuizScreen  state={state} dispatch={dispatch} />,
     RESULTS:          <ResultsScreen state={state} dispatch={dispatch} />,
+    DASHBOARD:        <DashboardScreen dispatch={dispatch} />,
   };
 
   return (
