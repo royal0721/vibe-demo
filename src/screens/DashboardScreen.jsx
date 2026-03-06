@@ -25,8 +25,9 @@ function getCharacterStats(characterId) {
     if (typeof playerData !== "object" || playerData === null) continue;
     const charData = playerData[characterId];
     if (!charData) continue;
-    if (charData.affection > bestAffection) {
-      bestAffection = charData.affection;
+    const aff = Number(charData.affection);
+    if (Number.isFinite(aff) && aff > bestAffection) {
+      bestAffection = aff;
       lastPlayed = charData.lastPlayed ?? null;
     }
     if (charData.confessionUnlocked) confessionUnlocked = true;
