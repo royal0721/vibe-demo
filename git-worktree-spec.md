@@ -8,7 +8,7 @@
 | ------------- | ---------------------------------------------- |
 | Branch Name   | `feature/score-dashboard`                      |
 | Based On      | `main`                                         |
-| Worktree Path | `/Users/clemmy.liao/vibe-demo-dashboard`       |
+| Worktree Path | `./vibe-demo-dashboard`                        |
 | Created At    | 2026-03-06                                     |
 
 ## Goal

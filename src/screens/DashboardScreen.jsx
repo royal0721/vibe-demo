@@ -14,9 +14,9 @@ const GRADE_COLOR = {
   d: "#6b7280",   // gray-500
 };
 
-// Aggregate best stats for a character across all players in localStorage
-function getCharacterStats(characterId) {
-  const all = getAllHistory();
+// Aggregate best stats for a character across all players in localStorage.
+// Accepts pre-loaded history to avoid repeated localStorage reads / JSON.parse.
+function getCharacterStats(characterId, all) {
   let bestAffection = 0;
   let confessionUnlocked = false;
   let lastPlayed = null;
@@ -28,7 +28,12 @@ function getCharacterStats(characterId) {
     const aff = Number(charData.affection);
     if (Number.isFinite(aff) && aff > bestAffection) {
       bestAffection = aff;
-      lastPlayed = charData.lastPlayed ?? null;
+    }
+    // Track most recent lastPlayed independently of bestAffection
+    if (charData.lastPlayed) {
+      if (!lastPlayed || charData.lastPlayed > lastPlayed) {
+        lastPlayed = charData.lastPlayed;
+      }
     }
     if (charData.confessionUnlocked) confessionUnlocked = true;
   }
@@ -38,11 +43,11 @@ function getCharacterStats(characterId) {
 
 function formatDate(iso) {
   if (!iso) return null;
-  try {
-    return new Date(iso).toLocaleDateString("zh-TW", { month: "short", day: "numeric" });
-  } catch {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
     return null;
   }
+  return date.toLocaleDateString("zh-TW", { month: "short", day: "numeric" });
 }
 
 function StatBlock({ label, value, color }) {
@@ -62,7 +67,8 @@ function CharacterCard({ character, data }) {
   const grade  = played ? getAffectionGrade(data.affection) : null;
   const gradeLabel = grade ? GRADE_LABEL[grade] : null;
   const gradeColor = grade ? GRADE_COLOR[grade] : null;
-  const barWidth   = played ? `${data.affection}%` : "0%";
+  const affection  = played ? Math.max(0, Math.min(100, Number(data.affection) || 0)) : 0;
+  const barWidth   = `${affection}%`;
 
   return (
     <div
@@ -101,7 +107,14 @@ function CharacterCard({ character, data }) {
               {character.name}
             </span>
             {played && data.confessionUnlocked && (
-              <span className="text-sm" title="告白已解鎖">💖</span>
+              <span
+                className="text-sm"
+                role="img"
+                aria-label="告白已解鎖"
+                title="告白已解鎖"
+              >
+                💖
+              </span>
             )}
           </div>
           <span className="font-mono text-xs text-gray-600">{character.specialtyLabel}</span>
@@ -124,7 +137,7 @@ function CharacterCard({ character, data }) {
         <div className="flex justify-between font-mono text-xs mb-1">
           <span style={{ color: played ? "#9ca3af" : "#374151" }}>好感度</span>
           <span style={{ color: played ? character.color.primary : "#374151" }}>
-            {played ? data.affection : "—"}
+            {played ? affection : "—"}
           </span>
         </div>
         <div className="h-2 rounded-full bg-dark-panel overflow-hidden">
@@ -149,7 +162,8 @@ function CharacterCard({ character, data }) {
 }
 
 export function DashboardScreen({ dispatch }) {
-  const charStats = CHARACTERS.map((c) => ({ character: c, data: getCharacterStats(c.id) }));
+  const allHistory = getAllHistory();
+  const charStats = CHARACTERS.map((c) => ({ character: c, data: getCharacterStats(c.id, allHistory) }));
 
   const played        = charStats.filter(({ data }) => data !== null);
   const conqueredCount = played.length;
@@ -186,7 +200,7 @@ export function DashboardScreen({ dispatch }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <StatBlock label="已攻略" value={`${conqueredCount} / 4`} color="#00f5d4" />
+          <StatBlock label="已攻略" value={`${conqueredCount} / ${CHARACTERS.length}`} color="#00f5d4" />
           <StatBlock label="平均好感" value={avgAffection !== null ? String(avgAffection) : "—"} color="#ff2d78" />
           <StatBlock label="最高分" value={bestChar ? bestChar.name : "—"} color="#b845f5" />
         </motion.div>
